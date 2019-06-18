@@ -1,5 +1,7 @@
 # KeyValues OCaml parser
 
+![Build Status](https://img.shields.io/azure-devops/build/quiverteam/5add453c-4936-4e4d-9bb7-321ca3504ee1/2.svg?style=popout-square)
+
 ## License
 
 ```
