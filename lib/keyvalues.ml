@@ -75,7 +75,16 @@ let expression = fix (fun expr ->
     let fact = parens expr <|> def in
     chainl1 fact (and' <|> or'))
 
-let tl = expression |> brackets
+let tl = fix (fun (top: node list t) ->
+    let block     = braces top   >>| fun x -> Block x in
+    let val_str   = key_or_value >>| fun x -> String x in
+    let value'    = (val_str <|> block)   <* spaces in
+    let cond      = (brackets expression) <* spaces in
+    let pair_cond = lift3 (fun k v c : node -> k, v, c)
+                          key_or_value value' cond in
+    let pair      = lift2 (fun k v : node -> k, v, Empty)
+                          key_or_value value' in
+    many (pair_cond <|> pair))
 
 (** Test function for debugging *)
 let test (s: string) = match parse_string tl s with
@@ -83,18 +92,40 @@ let test (s: string) = match parse_string tl s with
     | Error msg -> failwith msg
 
 (** Debug function that pretty-prints a condition recursively *)
-let rec print_condition = function
+let rec print_condition' = function
     | And (a, b) ->
         print_string "(";
-        print_condition a;
+        print_condition' a;
         print_string ") && (";
-        print_condition b;
+        print_condition' b;
         print_string ")"
     | Or (a, b) ->
         print_string "(";
-        print_condition a;
+        print_condition' a;
         print_string ") || (";
-        print_condition b;
+        print_condition' b;
         print_string ")"
     | Defined a -> print_string a
     | _ -> print_string "_"
+
+let print_condition s =
+    print_string " [ ";
+    print_condition' s;
+    print_string " ] "
+
+let rec print_keyvalues a = match a with
+    | [] -> ()
+    | x :: xs -> (match x with
+        | s, String v, c ->
+            print_string s;
+            print_string " ";
+            print_string v;
+            print_condition c
+        | s, Block v, c ->
+            print_string s;
+            print_string " { ";
+            print_keyvalues v;
+            print_string " } ";
+            print_condition c
+        );
+        print_keyvalues xs
