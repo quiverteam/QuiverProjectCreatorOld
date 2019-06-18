@@ -2,6 +2,39 @@
 
 [![Build Status](https://img.shields.io/azure-devops/build/quiverteam/be22e09b-4923-4f7c-b6d1-dd62114628d3/3.svg?style=flat-square)](https://dev.azure.com/quiverteam/QuiverProjectCreator)
 
+## Example
+
+This is an example of what a QPC build script would look like once this is
+finished. This syntax was decided on by myself and other developers working
+on Quiver related projects.
+
+```c
+language cpp
+
+#define SRCDIR "../../"
+#include "$SRCDIR/game/client/client_base.qpc"
+
+executable {
+    name some_game
+    include (
+        hl2r
+        hl2
+        "$SRCDIR/game/shared/hl2"
+        "$SRCDIR/game/shared/episodic"
+        ../../public
+        "$BASE"
+    )
+    file sauce.cpp
+    header linux.h [LINUX]
+    header shitshow.h [WINDOWS]
+
+    dynamic tier0
+    dynamic tier1
+    // imagine using boost in source lmao
+    static boost
+}
+```
+
 ## License
 
 ```
