@@ -1,7 +1,22 @@
 (** KeyValues is a package for parsing Valve's KeyValues1 file format, used in
     the Source engine and its tooling. This is more or less a translation of my
     F# implementation because ocaml is a better language and I'm tired of messing
-    with dotnet garbage. *)
+    with dotnet garbage.
+
+    Copyright (C) 2019  swissChili
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>. *)
 
 open Angstrom
 
@@ -75,6 +90,7 @@ let expression = fix (fun expr ->
     let fact = parens expr <|> def in
     chainl1 fact (and' <|> or'))
 
+(** The top-level parser, parses a bunch of keyvalues recursively *)
 let tl = fix (fun (top: node list t) ->
     let block     = braces top   >>| fun x -> Block x in
     let val_str   = key_or_value >>| fun x -> String x in
@@ -91,7 +107,7 @@ let test (s: string) = match parse_string tl s with
     | Ok r -> r
     | Error msg -> failwith msg
 
-(** Debug function that pretty-prints a condition recursively *)
+(** Auxiliary function for condition printing, should not be used explicitly. *)
 let rec print_condition' = function
     | And (a, b) ->
         print_string "(";
@@ -108,11 +124,13 @@ let rec print_condition' = function
     | Defined a -> print_string a
     | _ -> print_string "_"
 
+(** Debug function that pretty-prints a condition recursively *)
 let print_condition s =
     print_string " [ ";
     print_condition' s;
     print_string " ] "
 
+(** Debug function that pretty-prints keyvalues *)
 let rec print_keyvalues a = match a with
     | [] -> ()
     | x :: xs -> (match x with
