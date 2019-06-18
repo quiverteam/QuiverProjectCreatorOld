@@ -1,0 +1,24 @@
+# Azure Pipelines build script for KeyValues
+# installs opam and ocaml from apt, deps from opam, and build with dune
+
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- script: | 
+    sudo apt install ocaml opam
+  displayName: 'install ocaml and opam'
+
+- script: |
+    opam install ocaml-system
+    opam install dune
+    opam install angstrom
+    opam install odoc
+  displayName: 'install opam dependencies'
+
+- script: |
+    dune runtest
+  displayName: 'run dune tests'
