@@ -14,10 +14,10 @@ steps:
   displayName: 'install ocaml and opam'
 
 - script: |
-    opam install ocaml-system
-    opam install dune
-    opam install angstrom
-    opam install odoc
+    opam install ocaml-system -y
+    opam install dune -y
+    opam install angstrom -y
+    opam install odoc -y
   displayName: 'install opam dependencies'
 
 - script: |
