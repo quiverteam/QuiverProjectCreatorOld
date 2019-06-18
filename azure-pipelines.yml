@@ -16,9 +16,11 @@ steps:
 - script: |
     opam install ocaml-system -y
     opam install angstrom -y
+    opam install core -y
   displayName: 'install opam dependencies'
 
 - script: |
     opam install dune -y
-    dune runtest
+    # Start a new bash instance to load dune into the $PATH
+    bash -c 'dune runtest'
   displayName: 'run dune tests'
