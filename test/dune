@@ -1,3 +1,3 @@
 (test
- (name cond)
+ (name top)
  (libraries keyvalues))

@@ -17,7 +17,6 @@ steps:
     opam install ocaml-system -y
     opam install dune -y
     opam install angstrom -y
-    opam install odoc -y
   displayName: 'install opam dependencies'
 
 - script: |
