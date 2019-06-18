@@ -1,0 +1,15 @@
+opam-version: "1.2"
+maintainer: "swisschili@fastmail.com"
+authors: ["swissChili"]
+license: "BSD3"
+homepage: "https://github.com/quiverteam/keyvalues-ml"
+bug-reports: "https://github.com/quiverteam/keyvalues-ml/issues"
+dev-repo: "https://github.com/quiverteam/keyvalues-ml.git"
+build: [
+  ["dune" "build"]
+]
+depends: [
+  "angstrom"
+  "dune"
+]
+available: [ocaml-version >= "4.02.3"]
