@@ -15,10 +15,10 @@ steps:
 
 - script: |
     opam install ocaml-system -y
-    opam install dune -y
     opam install angstrom -y
   displayName: 'install opam dependencies'
 
 - script: |
+    opam install dune -y
     dune runtest
   displayName: 'run dune tests'

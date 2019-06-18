@@ -1,6 +1,6 @@
 # Quiver Project Creator
 
-![Build Status](https://img.shields.io/azure-devops/build/quiverteam/5add453c-4936-4e4d-9bb7-321ca3504ee1/2.svg?style=popout-square)
+[![Build Status](https://img.shields.io/azure-devops/build/quiverteam/be22e09b-4923-4f7c-b6d1-dd62114628d3/3.svg?style=flat-square)](https://dev.azure.com/quiverteam/QuiverProjectCreator)
 
 ## License
 
