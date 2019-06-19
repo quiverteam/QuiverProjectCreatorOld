@@ -48,7 +48,7 @@ let insert map k v =
 
 let get_all map k = Map.find map k
 
-let get_one map k = match Map.find map k with
+let get_one map k : value option = match Map.find map k with
     | None -> None
-    | Some (x :: _) -> x
+    | Some (x :: _) -> Some x
     | Some [] -> None
