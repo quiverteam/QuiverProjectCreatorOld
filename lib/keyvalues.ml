@@ -22,7 +22,7 @@ open Angstrom
 
 (** The value type is either a string in the form of a KV double-quoted string
     or identifier, or a block, containing a child syntax tree *)
-type value    = Str of string
+type value'   = Str' of string
               | Block of syntax
 
 (** The condition type represents a set of conditions that must be met in order
@@ -37,7 +37,7 @@ and condition = And of condition * condition
 
 (** A node is a single key-value pair. Syntactically it looks like this
     [key value \[CONDITION && ANOTHER_COND || YET_ANOTHER\]] *)
-and node      = string * value * condition
+and node      = string * value' * condition
 
 (** syntax is just a list of nodes. It's that simple. *)
 and syntax    = node list
@@ -93,7 +93,7 @@ let expression = fix (fun expr ->
 (** The top-level parser, parses a bunch of keyvalues recursively *)
 let tl = fix (fun (top: node list t) ->
     let block     = braces top   >>| fun x -> Block x in
-    let val_str   = key_or_value >>| fun x -> Str x in
+    let val_str   = key_or_value >>| fun x -> Str' x in
     let value'    = (val_str <|> block)   <* spaces in
     let cond      = (brackets expression) <* spaces in
     let pair_cond = lift3 (fun k v c : node -> k, v, c)
@@ -134,7 +134,7 @@ let print_condition s =
 let rec print_keyvalues a = match a with
     | [] -> ()
     | x :: xs -> (match x with
-        | s, Str v, c ->
+        | s, Str' v, c ->
             print_string s;
             print_string " ";
             print_string v;
