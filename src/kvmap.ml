@@ -42,7 +42,7 @@ let empty = Map.empty (module String)
 
 let insert map k v =
     let data = match Map.find map k with
-        | Some x -> x @ [v]
+        | Some x -> v :: x
         | None -> [v] in
     Map.add map ~key:k ~data:data
 
