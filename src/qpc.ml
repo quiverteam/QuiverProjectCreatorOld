@@ -20,10 +20,14 @@
 
 
 open Keyvalues
+open Kvmap
 
 
 let version = "0.1.0"
 
 let () =
     print_endline ("QPC v" ^ version);
-    print_keyvalues (test "hello world");
+    print_endline (match get_one (kvmap_of_syntax (test "hello world") []) "hello" with
+    | Some (Str a) -> a
+    | _ -> "");
+    ()
