@@ -1,0 +1,3 @@
+(executable
+ (name qpc)
+ (libraries keyvalues))
