@@ -143,13 +143,21 @@ let rec print_keyvalues a = match a with
     | [] -> ()
     | x :: xs -> (match x with
         | Node' (s, Str' v, c) ->
-            print_string s;
-            print_string " ";
-            print_string v;
+            print_string (s ^ " " ^ v);
             print_condition c
         | Node' (s, Block' v, c) ->
-            print_string s;
+            print_string (s ^ " { ");
+            print_keyvalues v;
+            print_string " } ";
+            print_condition c
+        | NamedNode' (s, n, Str' v, c) ->
+            print_string (s ^ " " ^ n);
             print_string " { ";
+            print_string v;
+            print_string " } ";
+            print_condition c
+        | NamedNode' (s, n, Block' v, c) ->
+            print_string (s ^ " " ^ n ^ " { ");
             print_keyvalues v;
             print_string " } ";
             print_condition c
