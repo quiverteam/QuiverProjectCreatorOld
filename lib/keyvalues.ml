@@ -38,6 +38,7 @@ and condition = And of condition * condition
 (** A node is a single key-value pair. Syntactically it looks like this
     [key value \[CONDITION && ANOTHER_COND || YET_ANOTHER\]] *)
 and node      = Node' of string * value' * condition
+              | NamedNode' of string * string * value' * condition
 
 (** syntax is just a list of nodes. It's that simple. *)
 and syntax    = node list
@@ -96,11 +97,18 @@ let tl = fix (fun (top: node list t) ->
     let val_str   = key_or_value >>| fun x -> Str' x in
     let value'    = (val_str <|> block)   <* spaces in
     let cond      = (brackets expression) <* spaces in
+
     let pair_cond = lift3 (fun k v c : node -> Node' (k, v, c))
                           key_or_value value' cond in
     let pair      = lift2 (fun k v : node -> Node' (k, v, Empty))
                           key_or_value value' in
-    many (pair_cond <|> pair))
+
+    let tripple   = lift3 (fun k n v : node -> NamedNode' (k, n, v, Empty))
+                          key_or_value key_or_value value' in
+    let tripple_c = lift4 (fun k n v c : node -> NamedNode' (k, n, v, c))
+                          key_or_value key_or_value value' cond in
+
+    many (tripple_c <|> tripple <|> pair_cond <|> pair))
 
 (** Test function for debugging *)
 let test (s: string) = match parse_string tl s with
