@@ -91,13 +91,26 @@ let rec bool_of_condition def = function
     | Defined a  -> List.exists def ~f:(String.equal a)
     | Empty      -> true
 
-let rec kvmap_of_syntax s def : kvmap = match s with
+let rec kvmap_of_syntax (s : node list) def : kvmap = match s with
     | [] -> empty
-    | (k, v, c) :: xs -> match bool_of_condition def c with
+    | Node' (k, v, c) :: xs -> (match bool_of_condition def c with
         | false -> kvmap_of_syntax xs def
         | true  ->
             let map = kvmap_of_syntax xs def in
             insert map k (match v with
                 | Str' a -> Str a
                 | Block' a -> Block (kvmap_of_syntax a def)
+            ))
+    | NamedNode' (k, n, v, c) :: xs -> (match bool_of_condition def c with
+        | false -> kvmap_of_syntax xs def
+        | true ->
+            let map = kvmap_of_syntax xs def in
+            insert map k (match v with
+                | Str' a ->
+                    let map' = insert empty "__VALUE__" (Str a) in
+                    Block     (insert map'  "__NAME__"  (Str n))
+                | Block' a ->
+                    let map' = insert empty "__NAME__"  (Str n) in
+                    Block     (insert map'  "__VALUE__" (Block (kvmap_of_syntax a def)))
             )
+        )
