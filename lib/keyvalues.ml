@@ -37,7 +37,7 @@ and condition = And of condition * condition
 
 (** A node is a single key-value pair. Syntactically it looks like this
     [key value \[CONDITION && ANOTHER_COND || YET_ANOTHER\]] *)
-and node      = string * value' * condition
+and node      = Node' of string * value' * condition
 
 (** syntax is just a list of nodes. It's that simple. *)
 and syntax    = node list
@@ -96,9 +96,9 @@ let tl = fix (fun (top: node list t) ->
     let val_str   = key_or_value >>| fun x -> Str' x in
     let value'    = (val_str <|> block)   <* spaces in
     let cond      = (brackets expression) <* spaces in
-    let pair_cond = lift3 (fun k v c : node -> k, v, c)
+    let pair_cond = lift3 (fun k v c : node -> Node' (k, v, c))
                           key_or_value value' cond in
-    let pair      = lift2 (fun k v : node -> k, v, Empty)
+    let pair      = lift2 (fun k v : node -> Node' (k, v, Empty))
                           key_or_value value' in
     many (pair_cond <|> pair))
 
@@ -134,12 +134,12 @@ let print_condition s =
 let rec print_keyvalues a = match a with
     | [] -> ()
     | x :: xs -> (match x with
-        | s, Str' v, c ->
+        | Node' (s, Str' v, c) ->
             print_string s;
             print_string " ";
             print_string v;
             print_condition c
-        | s, Block' v, c ->
+        | Node' (s, Block' v, c) ->
             print_string s;
             print_string " { ";
             print_keyvalues v;
