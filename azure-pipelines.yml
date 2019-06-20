@@ -22,5 +22,5 @@ steps:
 - script: |
     opam install dune -y
     # Start a new bash instance to load dune into the $PATH
-    bash -c 'dune runtest'
+    /home/ch/.opam/default/bin/dune runtest
   displayName: 'run dune tests'
