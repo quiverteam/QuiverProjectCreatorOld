@@ -22,6 +22,15 @@
 open Keyvalues
 open Base
 
+
+let (~!) (opt : 'a option) = match opt with
+    | Some a -> a
+    | None   -> Caml.exit 1
+
+let (=?) (opt : 'a option) (default : 'a) = match opt with
+    | Some a -> a
+    | None   -> default
+
 (** [value] is the OCaml representation of a value in a KeyValue file, not to
     be confused with [value'] which is the parser's representation of one,
     which is much lower level and should not be used other than to create this.
@@ -37,6 +46,14 @@ type value = Str of string
     an AST like the one the parser creates, but rather as a map that can be
     easily used by other functions *)
 and kvmap = (string, value list, String.comparator_witness) Map.t
+
+let expect_string v = match v with
+    | Str a -> a
+    | _ -> Caml.exit 1
+
+let expect_block v = match v with
+    | Block a -> a
+    | _ -> Caml.exit 1
 
 let empty = Map.empty (module String)
 
@@ -55,6 +72,14 @@ let get_one map k : value option = match Map.find map k with
     | None -> None
     | Some (x :: _) -> Some x
     | Some [] -> None
+
+let get_string_or_die map k err = match Map.find map k with
+    | Some (Str x :: _) -> x
+    | _ -> Caml.print_endline err; Caml.exit 1
+
+let get_block_or_die map k err = match Map.find map k with
+    | Some (Block x :: _) -> x
+    | _ -> Caml.print_endline err; Caml.exit 1
 
 (** [bool_of_condition] evaluates a condition in a given context.
     @argument [string list] defined

@@ -25,9 +25,9 @@ open Kvmap
 
 let version = "0.1.0"
 
+let to_test = (kvmap_of_syntax (test "hello world") [])
+
 let () =
     print_endline ("QPC v" ^ version);
-    print_endline (match get_one (kvmap_of_syntax (test "hello world") []) "hello" with
-    | Some (Str a) -> a
-    | _ -> "");
+    print_endline (get_string_or_die to_test "hello" "key `hello` not found!");
     ()
