@@ -3,6 +3,11 @@
  (modules kvmap)
  (libraries keyvalues base))
 
+(library
+ (name project)
+ (modules project)
+ (libraries keyvalues kvmap))
+
 (executable
  (name qpc)
  (modules qpc)
