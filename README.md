@@ -9,29 +9,39 @@ finished. This syntax was decided on by myself and other developers working
 on Quiver related projects.
 
 ```c
+// main.qpc
 language cpp
 
-#define SRCDIR "../../"
-#include "$SRCDIR/game/client/client_base.qpc"
+// import the other sub project
+import lib/bar.qpc
 
-executable {
-    name some_game
-    include (
-        hl2r
-        hl2
-        "$SRCDIR/game/shared/hl2"
-        "$SRCDIR/game/shared/episodic"
-        ../../public
-        "$BASE"
-    )
-    file sauce.cpp
-    header linux.h [LINUX]
-    header shitshow.h [WINDOWS]
+// create an executable called foo
+executable foo {
+    source foo.cpp
+    source main.cpp
+    // this is a `file`, used to check if the recipe is fresh, but not given
+    // to the compiler itself
+    file foo.h
 
-    dynamic tier0
-    dynamic tier1
-    // imagine using boost in source lmao
-    static boost
+    dependency bar
+}
+
+// lib/bar.qpc
+language cpp
+
+// the current directory will be included (`-I` flag)
+include .
+
+library bar {
+    source bar.cpp
+    file bar.hpp
+
+    // static || dynamic
+    type static
+
+    // dependency found via. native package configurator
+    // e.g: `pkg-config` on linux, windows prob has something like this.
+    dependency gtk+-3.0
 }
 ```
 
