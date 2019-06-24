@@ -1,0 +1,10 @@
+language cpp
+
+import lib/lib.qpc
+
+executable hello
+{
+    source main.cpp
+
+    dependency foo
+}

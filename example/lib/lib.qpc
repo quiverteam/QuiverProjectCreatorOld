@@ -1,0 +1,7 @@
+language cpp
+
+library foo
+{
+    source lib.cpp
+    header lib.h
+}
