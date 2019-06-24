@@ -63,6 +63,13 @@ let insert (map : kvmap) k v : kvmap =
         | None -> [v] in
     Map.set map ~key:k ~data:data
 
+let insert_unique (map : kvmap) k v : kvmap =
+    match Map.find map k with
+        | Some _ ->
+            Caml.print_endline ("Key " ^ k ^ " should not be explicitly defined.");
+            Caml.exit 1
+        | None -> Map.set map ~key:k ~data:[v]
+
 let get_all map k = Map.find map k
 
 (** [get_one] is useful for extracting a value that is meant to be declared
@@ -91,7 +98,11 @@ let rec bool_of_condition def = function
     | Defined a  -> List.exists def ~f:(String.equal a)
     | Empty      -> true
 
-let rec kvmap_of_syntax (s : node list) def : kvmap = match s with
+(** [kvmap_of_syntax] converts some [syntax] to a [kvmap], allowing its contents to
+    be utilized more easily with O(1) time complexity.
+    @argument [s] syntax
+    @argument [def] list of defined keywords *)
+let rec kvmap_of_syntax (s : syntax) def : kvmap = match s with
     | [] -> empty
     | Node' (k, v, c) :: xs -> (match bool_of_condition def c with
         | false -> kvmap_of_syntax xs def
@@ -101,16 +112,8 @@ let rec kvmap_of_syntax (s : node list) def : kvmap = match s with
                 | Str' a -> Str a
                 | Block' a -> Block (kvmap_of_syntax a def)
             ))
-    | NamedNode' (k, n, v, c) :: xs -> (match bool_of_condition def c with
+    | NamedNode' (k, n, v, c) :: xs -> match bool_of_condition def c with
         | false -> kvmap_of_syntax xs def
         | true ->
             let map = kvmap_of_syntax xs def in
-            insert map k (match v with
-                | Str' a ->
-                    let map' = insert empty "__VALUE__" (Str a) in
-                    Block     (insert map'  "__NAME__"  (Str n))
-                | Block' a ->
-                    let map' = insert empty "__NAME__"  (Str n) in
-                    Block     (insert map'  "__VALUE__" (Block (kvmap_of_syntax a def)))
-            )
-        )
+            insert map k (Block (insert (kvmap_of_syntax v def) "__name__"  (Str n)))

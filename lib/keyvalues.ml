@@ -38,7 +38,7 @@ and condition = And of condition * condition
 (** A node is a single key-value pair. Syntactically it looks like this
     [key value \[CONDITION && ANOTHER_COND || YET_ANOTHER\]] *)
 and node      = Node' of string * value' * condition
-              | NamedNode' of string * string * value' * condition
+              | NamedNode' of string * string * syntax * condition
 
 (** syntax is just a list of nodes. It's that simple. *)
 and syntax    = node list
@@ -93,9 +93,9 @@ let expression = fix (fun expr ->
 
 (** The top-level parser, parses a bunch of keyvalues recursively *)
 let tl = fix (fun (top: node list t) ->
-    let block     = braces top   >>| fun x -> Block' x in
-    let val_str   = key_or_value >>| fun x -> Str' x in
-    let value'    = (val_str <|> block)   <* spaces in
+    let block     = braces top   <* spaces >>| fun x -> Block' x in
+    let val_str   = key_or_value <* spaces >>| fun x -> Str' x in
+    let value'    = val_str <|> block in
     let cond      = (brackets expression) <* spaces in
 
     let pair_cond = lift3 (fun k v c : node -> Node' (k, v, c))
@@ -104,9 +104,9 @@ let tl = fix (fun (top: node list t) ->
                           key_or_value value' in
 
     let tripple   = lift3 (fun k n v : node -> NamedNode' (k, n, v, Empty))
-                          key_or_value key_or_value value' in
+                          key_or_value key_or_value (braces top <* spaces) in
     let tripple_c = lift4 (fun k n v c : node -> NamedNode' (k, n, v, c))
-                          key_or_value key_or_value value' cond in
+                          key_or_value key_or_value (braces top <* spaces) cond in
 
     many (tripple_c <|> tripple <|> pair_cond <|> pair))
 
@@ -150,13 +150,7 @@ let rec print_keyvalues a = match a with
             print_keyvalues v;
             print_string " } ";
             print_condition c
-        | NamedNode' (s, n, Str' v, c) ->
-            print_string (s ^ " " ^ n);
-            print_string " { ";
-            print_string v;
-            print_string " } ";
-            print_condition c
-        | NamedNode' (s, n, Block' v, c) ->
+        | NamedNode' (s, n, v, c) ->
             print_string (s ^ " " ^ n ^ " { ");
             print_keyvalues v;
             print_string " } ";

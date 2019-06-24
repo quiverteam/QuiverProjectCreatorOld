@@ -26,8 +26,19 @@ open Kvmap
 let version = "0.1.0"
 
 let to_test = (kvmap_of_syntax (test "hello world") [])
+let exec_test = kvmap_of_syntax (test "executable foo { bar baz }") []
 
 let () =
     print_endline ("QPC v" ^ version);
+    (* should be world *)
     print_endline (get_string_or_die to_test "hello" "key `hello` not found!");
+    (* should be `foo` *)
+    print_endline
+        (get_string_or_die
+            (get_block_or_die
+                exec_test
+                "executable"
+                "exec not found")
+            "__name__"
+            "__name__ not found");
     ()
