@@ -6,9 +6,9 @@
 (library
  (name project)
  (modules project)
- (libraries keyvalues kvmap))
+ (libraries kvmap))
 
 (executable
  (name qpc)
  (modules qpc)
- (libraries keyvalues kvmap))
+ (libraries keyvalues kvmap project))
