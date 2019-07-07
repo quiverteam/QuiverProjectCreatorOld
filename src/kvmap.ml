@@ -57,7 +57,7 @@ let expect_block v = match v with
 
 let empty = Map.empty (module String)
 
-let insert (map : kvmap) k v : kvmap =
+let insert map k v =
     let data = match Map.find map k with
         | Some x -> x @ [v]
         | None -> [v] in
@@ -87,6 +87,16 @@ let get_string_or_die map k err = match Map.find map k with
 let get_block_or_die map k err = match Map.find map k with
     | Some (Block x :: _) -> x
     | _ -> Caml.print_endline err; Caml.exit 1
+
+let rec all_strings acc = function
+    | [] -> acc
+    | (Str x) :: xs -> all_strings (acc @ [x]) xs
+    | _ :: xs -> all_strings acc xs
+
+let rec all_blocks acc = function
+    | [] -> acc
+    | (Block x) :: xs -> all_blocks (acc @ [x]) xs
+    | _ :: xs -> all_blocks acc xs
 
 (** [bool_of_condition] evaluates a condition in a given context.
     @argument [string list] defined
